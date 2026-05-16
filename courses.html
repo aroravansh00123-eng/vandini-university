@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vandini University – Courses</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet"/>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Poppins', sans-serif; background: #f4f6fb; color: #0d1b2e; }
+
+    nav { background: #0d1b2e; padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,.4); }
+    nav .brand { color: #fff; font-weight: 700; font-size: 20px; }
+    nav ul { list-style: none; display: flex; gap: 32px; }
+    nav ul a { color: #fff; text-decoration: none; font-size: 15px; }
+    nav ul a:hover { color: #f5c518; }
+
+    .hero { background: #0d1b2e; text-align: center; padding: 60px 20px 50px; position: relative; overflow: hidden; }
+    .hero::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(45deg, rgba(245,197,24,.03) 0px, rgba(245,197,24,.03) 1px, transparent 1px, transparent 40px); }
+    .hero h1 { font-size: 48px; font-weight: 900; color: #fff; position: relative; }
+    .hero h1 span { color: #f5c518; }
+    .hero p { color: #a0b0c8; margin-top: 10px; font-size: 16px; position: relative; }
+    .hero-line { width: 70px; height: 4px; background: #f5c518; border-radius: 2px; margin: 16px auto 0; }
+
+    .count-bar { text-align: center; padding: 14px; background: #f5c518; font-weight: 700; font-size: 14px; color: #0d1b2e; letter-spacing: .5px; }
+
+    .filters { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; padding: 32px 20px 10px; }
+    .tab { padding: 9px 22px; border-radius: 25px; border: 2px solid #0d1b2e; background: transparent; color: #0d1b2e; font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 13px; cursor: pointer; transition: all .25s; }
+    .tab.active, .tab:hover { background: #0d1b2e; color: #f5c518; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; padding: 28px 40px 60px; max-width: 1400px; margin: 0 auto; }
+
+    .card { background: #fff; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,.07); transition: transform .25s, box-shadow .25s; display: flex; flex-direction: column; }
+    .card:hover { transform: translateY(-5px); box-shadow: 0 12px 28px rgba(0,0,0,.12); }
+
+    .card-top { padding: 20px 18px 14px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #f0f0f0; }
+    .card-icon { width: 46px; height: 46px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .card-title { font-size: 14px; font-weight: 700; color: #0d1b2e; line-height: 1.3; }
+    .card-tag { display: inline-block; margin-top: 3px; font-size: 9px; font-weight: 600; padding: 2px 9px; border-radius: 20px; letter-spacing: .5px; }
+
+    .card-body { padding: 13px 18px 16px; flex: 1; }
+    .card-body p { font-size: 12.5px; color: #4a5568; line-height: 1.65; }
+
+    .card-footer { padding: 10px 18px 16px; display: flex; justify-content: space-between; align-items: center; }
+    .duration { font-size: 11px; color: #888; font-weight: 600; }
+    .btn { background: #0d1b2e; color: #f5c518; border: none; padding: 7px 16px; border-radius: 20px; font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 700; cursor: pointer; transition: background .2s; }
+    .btn:hover { background: #f5c518; color: #0d1b2e; }
+
+    .tech .card-icon { background: #e8f4fd; } .tech .card-tag { background: #e8f4fd; color: #1565c0; }
+    .eng  .card-icon { background: #fff3e0; } .eng  .card-tag { background: #fff3e0; color: #e65100; }
+    .med  .card-icon { background: #fce4ec; } .med  .card-tag { background: #fce4ec; color: #c62828; }
+    .law  .card-icon { background: #ede7f6; } .law  .card-tag { background: #ede7f6; color: #4527a0; }
+    .biz  .card-icon { background: #e8f5e9; } .biz  .card-tag { background: #e8f5e9; color: #2e7d32; }
+
+    .section-divider { grid-column: 1 / -1; display: flex; align-items: center; gap: 16px; margin: 16px 0 4px; }
+    .section-divider span { font-size: 13px; font-weight: 700; color: #0d1b2e; white-space: nowrap; letter-spacing: 1px; text-transform: uppercase; }
+    .section-divider::before, .section-divider::after { content: ''; flex: 1; height: 2px; background: #e2e8f0; }
+
+    .card.hidden { display: none; }
+    .section-divider.hidden { display: none; }
+
+    .footer-strip { background: #0d1b2e; color: #a0b0c8; text-align: center; padding: 20px; font-size: 13px; }
+    .footer-strip span { color: #f5c518; }
+
+    /* ── Hamburger (hidden on desktop) ── */
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: #fff; border-radius: 2px; transition: all .3s; }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      /* Nav */
+      nav { padding: 14px 20px; flex-wrap: wrap; gap: 0; }
+      .hamburger { display: flex; }
+      nav ul {
+        display: none; flex-direction: column; gap: 0;
+        width: 100%; background: #0d1b2e;
+        margin-top: 12px; border-top: 1px solid rgba(255,255,255,.1);
+      }
+      nav ul.open { display: flex; }
+      nav ul li a { display: block; padding: 12px 4px; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,.07); }
+
+      /* Hero */
+      .hero { padding: 40px 16px 36px; }
+      .hero h1 { font-size: 30px; }
+      .hero p { font-size: 13px; }
+
+      /* Count bar */
+      .count-bar { font-size: 12px; padding: 10px 12px; }
+
+      /* Filters */
+      .filters { padding: 20px 12px 8px; gap: 8px; }
+      .tab { padding: 7px 14px; font-size: 12px; }
+
+      /* Grid */
+      .grid { grid-template-columns: 1fr; padding: 16px 14px 40px; gap: 14px; }
+
+      /* Section divider text wrapping */
+      .section-divider span { font-size: 11px; letter-spacing: .5px; }
+    }
+
+    @media (max-width: 400px) {
+      .hero h1 { font-size: 26px; }
+      nav .brand { font-size: 17px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">Vandini University</div>
+  <button class="hamburger" id="menuBtn" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+  <ul id="navLinks">
+     <li><a href="index.html"><b>Home</b></a></li>
+    <li><a href="about.html"><b>About</b></a></li>
+    <li><a href="courses.html" style="color:#f5c518"><b>Courses</b></a></li>
+    <li><a href="add.html"><b>Admissions</b></a></li>
+    <li><a href="contact.html"><b>Contact</b></a></li>
+  </ul>
+</nav>
+
+<div class="hero">
+  <h1>Our <span>Courses</span></h1>
+  <p>Explore world-class programmes across five prestigious schools</p>
+  <div class="hero-line"></div>
+</div>
+<div class="count-bar">🎓 120+ Programmes Offered Across 5 Schools</div>
+
+<div class="filters">
+  <button class="tab active" onclick="filter('all',this)">All Courses</button>
+  <button class="tab" onclick="filter('tech',this)">💻 Technology</button>
+  <button class="tab" onclick="filter('eng',this)">⚙️ Engineering</button>
+  <button class="tab" onclick="filter('med',this)">🏥 Medical Science</button>
+  <button class="tab" onclick="filter('law',this)">⚖️ Law</button>
+  <button class="tab" onclick="filter('biz',this)">📈 Business</button>
+</div>
+
+<div class="grid">
+
+<!-- ═══════════════ TECHNOLOGY (28 courses) ═══════════════ -->
+<div class="section-divider"><span>💻 School of Technology</span></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">💻</div><div><div class="card-title">B.Tech Computer Science & Engineering</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>Programming, data structures, algorithms, AI, and software engineering for top tech careers.</p></div><div class="card-footer"><span class="duration">⏱️ 4 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">🤖</div><div><div class="card-title">M.Tech Artificial Intelligence</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>Machine learning, deep learning, NLP, and computer vision for AI research and product development.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">🔐</div><div><div class="card-title">B.Sc Cyber Security</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>Ethical hacking, network security, cryptography, and digital forensics for modern infrastructure protection.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">🎓</div><div><div class="card-title">BCA – Bachelor of Computer Applications</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>Programming fundamentals, database management, web development, and software design.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">🖥️</div><div><div class="card-title">MCA – Master of Computer Applications</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>Advanced programming, cloud computing, data science, and enterprise software development.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">☁️</div><div><div class="card-title">B.Sc Cloud Computing & DevOps</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>AWS, Azure, Docker, Kubernetes, and CI/CD pipelines for modern cloud-first development.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">📊</div><div><div class="card-title">B.Sc Data Science & Analytics</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>Statistics, Python, machine learning, data visualisation, and big data tools for analyst roles.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">📱</div><div><div class="card-title">B.Sc Mobile App Development</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>Android & iOS development, React Native, Flutter, and app deployment on global platforms.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">🌐</div><div><div class="card-title">B.Sc Web Technologies</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>HTML, CSS, JavaScript, React, Node.js, and full-stack web development for modern web careers.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">🧠</div><div><div class="card-title">M.Tech Machine Learning</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>Deep dive into neural networks, reinforcement learning, model deployment, and AI systems architecture.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">🔗</div><div><div class="card-title">B.Sc Blockchain Technology</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>Smart contracts, DeFi, Web3, Solidity, and distributed ledger systems for the decentralised future.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">🕹️</div><div><div class="card-title">B.Sc Game Development & Design</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>Unity, Unreal Engine, 3D modelling, game physics, and interactive media for the gaming industry.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">🤖</div><div><div class="card-title">B.Tech Robotics & Automation</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>Mechatronics, ROS, embedded systems, and industrial robotics for automation-driven industries.</p></div><div class="card-footer"><span class="duration">⏱️ 4 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">📡</div><div><div class="card-title">B.Sc Internet of Things (IoT)</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>Sensors, Arduino, Raspberry Pi, smart systems, and IoT network architecture for connected devices.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">🖱️</div><div><div class="card-title">B.Sc UI/UX Design & Technology</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>Figma, prototyping, user research, accessibility, and design systems for product and digital design careers.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">🔬</div><div><div class="card-title">M.Tech Data Engineering</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>Data pipelines, ETL, Apache Spark, Kafka, and large-scale data infrastructure design and management.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">🛡️</div><div><div class="card-title">M.Tech Cyber Defence & Forensics</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>Advanced penetration testing, incident response, malware analysis, and digital forensics investigation.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">💾</div><div><div class="card-title">B.Sc Database Management Systems</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>SQL, NoSQL, Oracle, MongoDB, data warehousing, and database administration for enterprise systems.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">🧮</div><div><div class="card-title">B.Sc Computational Mathematics</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>Numerical methods, algorithms, scientific computing, and mathematical modelling for tech and research.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">🔭</div><div><div class="card-title">M.Tech Computer Vision & Imaging</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>Image processing, object detection, OpenCV, GANs, and visual AI systems for research and industry.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">🏗️</div><div><div class="card-title">B.Tech Software Engineering</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>Agile, DevOps, system architecture, testing, and large-scale software project lifecycle management.</p></div><div class="card-footer"><span class="duration">⏱️ 4 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">🌍</div><div><div class="card-title">B.Sc Network Engineering</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>CCNA/CCNP concepts, routing, switching, firewall configuration, and enterprise network design.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">🤝</div><div><div class="card-title">B.Tech Human-Computer Interaction</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>Cognitive science, usability engineering, voice interfaces, and accessibility-first product design.</p></div><div class="card-footer"><span class="duration">⏱️ 4 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">📲</div><div><div class="card-title">B.Sc Digital Transformation</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>Business + technology integration, ERP systems, automation tools, and enterprise digital strategy.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">🔮</div><div><div class="card-title">M.Tech Extended Reality (AR/VR/MR)</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>Augmented, virtual, and mixed reality development for gaming, healthcare, training, and enterprise use.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">🧩</div><div><div class="card-title">B.Sc Quantum Computing</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>Qubits, quantum algorithms, Qiskit, and quantum cryptography — the frontier of next-gen computing.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">⚡</div><div><div class="card-title">M.Tech High Performance Computing</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>Parallel computing, GPU programming, supercomputing clusters, and scientific simulation at scale.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card tech"><div class="card-top"><div class="card-icon">🎯</div><div><div class="card-title">Ph.D Computer Science</div><span class="card-tag">Technology</span></div></div><div class="card-body"><p>Research-focused doctoral programme in computing, AI, systems, networking, or emerging technology domains.</p></div><div class="card-footer"><span class="duration">⏱️ 3–5 Years</span><button class="btn">Learn More</button></div></div>
+
+<!-- ═══════════════ ENGINEERING (26 courses) ═══════════════ -->
+<div class="section-divider"><span>⚙️ School of Engineering</span></div>
+
+<div class="card eng"><div class="card-top"><div class="card-icon">🏗️</div><div><div class="card-title">B.Tech Civil Engineering</div><span class="card-tag">Engineering</span></div></div><div class="card-body"><p>Structural design, urban planning, transportation, and construction management.</p></div><div class="card-footer"><span class="duration">⏱️ 4 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card eng"><div class="card-top"><div class="card-icon">⚡</div><div><div class="card-title">B.Tech Electrical Engineering</div><span class="card-tag">Engineering</span></div></div><div class="card-body"><p>Power systems, electronics, control systems, and renewable energy for energy and manufacturing sectors.</p></div><div class="card-footer"><span class="duration">⏱️ 4 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card eng"><div class="card-top"><div class="card-icon">🚀</div><div><div class="card-title">M.Tech Aerospace Engineering</div><span class="card-tag">Engineering</span></div></div><div class="card-body"><p>Aerodynamics, propulsion, spacecraft design, and avionics for aviation and space agencies.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card eng"><div class="card-top"><div class="card-icon">🔧</div><div><div class="card-title">B.Tech Mechanical Engineering</div><span class="card-tag">Engineering</span></div></div><div class="card-body"><p>Thermodynamics, fluid mechanics, CAD/CAM, and manufacturing processes across industries.</p></div><div class="card-footer"><span class="duration">⏱️ 4 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card eng"><div class="card-top"><div class="card-icon">📡</div><div><div class="card-title">B.Tech Electronics & Communication</div><span class="card-tag">Engineering</span></div></div><div class="card-body"><p>VLSI, signal processing, embedded systems, and wireless communication for telecom and IoT.</p></div><div class="card-footer"><span class="duration">⏱️ 4 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card eng"><div class="card-top"><div class="card-icon">🌱</div><div><div class="card-title">B.Tech Environmental Engineering</div><span class="card-tag">Engineering</span></div></div><div class="card-body"><p>Sustainable development, waste management, water treatment, and green energy solutions.</p></div><div class="card-footer"><span class="duration">⏱️ 4 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card eng"><div class="card-top"><div class="card-icon">🏭</div><div><div class="card-title">M.Tech Industrial Engineering</div><span class="card-tag">Engineering</span></div></div><div class="card-body"><p>Production systems, supply chains, and operations management at an industrial scale.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card eng"><div class="card-top"><div class="card-icon">⚗️</div><div><div class="card-title">B.Tech Chemical Engineering</div><span class="card-tag">Engineering</span></div></div><div class="card-body"><p>Chemical processes, reaction engineering, petrochemicals, and process plant design and safety.</p></div><div class="card-footer"><span class="duration">⏱️ 4 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card eng"><div class="card-top"><div class="card-icon">⛏️</div><div><div class="card-title">B.Tech Mining Engineering</div><span class="card-tag">Engineering</span></div></div><div class="card-body"><p>Extraction technology, mine safety, geology, and resource management for the mining industry.</p></div><div class="card-footer"><span class="duration">⏱️ 4 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card eng"><div class="card-top"><div class="card-icon">🚗</div><div><div class="card-title">B.Tech Automobile Engineering</div><span class="card-tag">Engineering</span></div></div><div class="card-body"><p>Vehicle design, powertrains, electric vehicles, and automotive manufacturing processes.</p></div><div class="card-footer"><span class="duration">⏱️ 4 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card eng"><div class="card-top"><div class="card-icon">🌊</div><div><div class="card-title">B.Tech Marine Engineering</div><span class="card-tag">Engineering</span></div></div><div class="card-body"><p>Ship design, naval architecture, offshore structures, and maritime systems engineering.</p></div><div class="card-footer"><span class="duration">⏱️ 4 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card eng"><div class="card-top"><div class="card-icon">🔬</div><div><div class="card-title">B.Tech Biotechnology Engineering</div><span class="card-tag">Engineering</span></div></div><div class="card-body"><p>Genetic engineering, bioprocessing, pharmaceutical manufacturing, and bioinformatics applications.</p></div><div class="card-footer"><span class="duration">⏱️ 4 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card eng"><div class="card-top"><div class="card-icon">🏙️</div><div><div class="card-title">M.Tech Structural Engineering</div><span class="card-tag">Engineering</span></div></div><div class="card-body"><p>Advanced structural analysis, earthquake engineering, bridge design, and high-rise construction.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card eng"><div class="card-top"><div class="card-icon">🔋</div><div><div class="card-title">M.Tech Renewable Energy Engineering</div><span class="card-tag">Engineering</span></div></div><div class="card-body"><p>Solar, wind, hydro, and hydrogen energy systems design, storage, and grid integration.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card eng"><div class="card-top"><div class="card-icon">🛸</div><div><div class="card-title">B.Tech Avionics Engineering</div><span class="card-tag">Engineering</span></div></div><div class="card-body"><p>Aircraft electronics, navigation systems, flight control, and unmanned aerial vehicle technology.</p></div><div class="card-footer"><span class="duration">⏱️ 4 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card eng"><div class="card-top"><div class="card-icon">🧲</div><div><div class="card-title">B.Tech Instrumentation Engineering</div><span class="card-tag">Engineering</span></div></div><div class="card-body"><p>Sensors, process control, measurement systems, and industrial automation instrumentation.</p></div><div class="card-footer"><span class="duration">⏱️ 4 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card eng"><div class="card-top"><div class="card-icon">🛣️</div><div><div class="card-title">M.Tech Transportation Engineering</div><span class="card-tag">Engineering</span></div></div><div class="card-body"><p>Highway design, traffic engineering, smart mobility systems, and sustainable transport planning.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card eng"><div class="card-top"><div class="card-icon">🧱</div><div><div class="card-title">B.Tech Construction Technology</div><span class="card-tag">Engineering</span></div></div><div class="card-body"><p>Building materials, project management, green construction, and BIM modelling for construction firms.</p></div><div class="card-footer"><span class="duration">⏱️ 4 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card eng"><div class="card-top"><div class="card-icon">🌡️</div><div><div class="card-title">M.Tech Thermal Engineering</div><span class="card-tag">Engineering</span></div></div><div class="card-body"><p>Heat transfer, combustion, HVAC systems, and thermodynamic analysis for energy industries.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card eng"><div class="card-top"><div class="card-icon">🏔️</div><div><div class="card-title">B.Tech Geological Engineering</div><span class="card-tag">Engineering</span></div></div><div class="card-body"><p>Rock mechanics, geotechnical surveys, earthquake risk, and land use planning for civil projects.</p></div><div class="card-footer"><span class="duration">⏱️ 4 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card eng"><div class="card-top"><div class="card-icon">🖨️</div><div><div class="card-title">B.Tech Manufacturing Engineering</div><span class="card-tag">Engineering</span></div></div><div class="card-body"><p>Lean manufacturing, CNC machining, quality control, and advanced production system design.</p></div><div class="card-footer"><span class="duration">⏱️ 4 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card eng"><div class="card-top"><div class="card-icon">💡</div><div><div class="card-title">M.Tech Power Systems Engineering</div><span class="card-tag">Engineering</span></div></div><div class="card-body"><p>Smart grids, power electronics, transmission networks, and electrical energy management systems.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card eng"><div class="card-top"><div class="card-icon">🧬</div><div><div class="card-title">M.Tech Nanotechnology Engineering</div><span class="card-tag">Engineering</span></div></div><div class="card-body"><p>Nanomaterials, nano-devices, and nanotechnology applications in medicine, energy, and electronics.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card eng"><div class="card-top"><div class="card-icon">🏗️</div><div><div class="card-title">B.Tech Urban & Infrastructure Planning</div><span class="card-tag">Engineering</span></div></div><div class="card-body"><p>Smart city planning, zoning laws, infrastructure design, and sustainable urban development strategies.</p></div><div class="card-footer"><span class="duration">⏱️ 4 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card eng"><div class="card-top"><div class="card-icon">🔩</div><div><div class="card-title">B.Tech Mechatronics Engineering</div><span class="card-tag">Engineering</span></div></div><div class="card-body"><p>Integration of mechanical, electrical, and computer engineering for automated and robotic systems.</p></div><div class="card-footer"><span class="duration">⏱️ 4 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card eng"><div class="card-top"><div class="card-icon">🎯</div><div><div class="card-title">Ph.D Engineering Sciences</div><span class="card-tag">Engineering</span></div></div><div class="card-body"><p>Doctoral research across all engineering disciplines with lab access, industry collaboration and funding.</p></div><div class="card-footer"><span class="duration">⏱️ 3–5 Years</span><button class="btn">Learn More</button></div></div>
+
+<!-- ═══════════════ MEDICAL SCIENCE (26 courses) ═══════════════ -->
+<div class="section-divider"><span>🏥 School of Medical Science</span></div>
+
+<div class="card med"><div class="card-top"><div class="card-icon">🩺</div><div><div class="card-title">MBBS</div><span class="card-tag">Medical Science</span></div></div><div class="card-body"><p>Anatomy, physiology, pharmacology, and clinical practice — the foundation of a medical career.</p></div><div class="card-footer"><span class="duration">⏱️ 5.5 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card med"><div class="card-top"><div class="card-icon">🧬</div><div><div class="card-title">B.Sc Biotechnology</div><span class="card-tag">Medical Science</span></div></div><div class="card-body"><p>Genetics, molecular biology, bioinformatics, and biomedical research for medical innovation.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card med"><div class="card-top"><div class="card-icon">💊</div><div><div class="card-title">B.Pharm Pharmacy</div><span class="card-tag">Medical Science</span></div></div><div class="card-body"><p>Drug development, pharmacology, clinical pharmacy, and healthcare systems for pharma careers.</p></div><div class="card-footer"><span class="duration">⏱️ 4 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card med"><div class="card-top"><div class="card-icon">🏥</div><div><div class="card-title">B.Sc Nursing</div><span class="card-tag">Medical Science</span></div></div><div class="card-body"><p>Patient care, clinical nursing, community health, and medical procedures for healthcare careers.</p></div><div class="card-footer"><span class="duration">⏱️ 4 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card med"><div class="card-top"><div class="card-icon">🦷</div><div><div class="card-title">BDS – Bachelor of Dental Surgery</div><span class="card-tag">Medical Science</span></div></div><div class="card-body"><p>Oral health, dental surgery, orthodontics, and preventive dentistry for aspiring dental surgeons.</p></div><div class="card-footer"><span class="duration">⏱️ 5 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card med"><div class="card-top"><div class="card-icon">🧪</div><div><div class="card-title">B.Sc Medical Lab Technology</div><span class="card-tag">Medical Science</span></div></div><div class="card-body"><p>Diagnostic techniques, pathology, haematology, and lab instrumentation for hospital labs.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card med"><div class="card-top"><div class="card-icon">🧠</div><div><div class="card-title">M.Sc Neuroscience</div><span class="card-tag">Medical Science</span></div></div><div class="card-body"><p>Brain function, neurological disorders, neuroimaging, and cognitive science for research careers.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card med"><div class="card-top"><div class="card-icon">🫀</div><div><div class="card-title">M.D General Medicine</div><span class="card-tag">Medical Science</span></div></div><div class="card-body"><p>Postgraduate clinical training in internal medicine, diagnostics, and treatment of complex diseases.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card med"><div class="card-top"><div class="card-icon">🔬</div><div><div class="card-title">M.Sc Microbiology</div><span class="card-tag">Medical Science</span></div></div><div class="card-body"><p>Bacteriology, virology, immunology, and infectious disease research for healthcare and pharma.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card med"><div class="card-top"><div class="card-icon">🩻</div><div><div class="card-title">B.Sc Radiology & Imaging Technology</div><span class="card-tag">Medical Science</span></div></div><div class="card-body"><p>X-ray, MRI, CT scan operation, radiation safety, and medical imaging for diagnostic radiology.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card med"><div class="card-top"><div class="card-icon">🦴</div><div><div class="card-title">B.Sc Physiotherapy</div><span class="card-tag">Medical Science</span></div></div><div class="card-body"><p>Rehabilitation, musculoskeletal therapy, sports injuries, and neurological physiotherapy practice.</p></div><div class="card-footer"><span class="duration">⏱️ 4.5 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card med"><div class="card-top"><div class="card-icon">👶</div><div><div class="card-title">B.Sc Nutrition & Dietetics</div><span class="card-tag">Medical Science</span></div></div><div class="card-body"><p>Clinical nutrition, therapeutic diets, food science, and public health nutrition counselling.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card med"><div class="card-top"><div class="card-icon">💉</div><div><div class="card-title">M.Sc Clinical Research</div><span class="card-tag">Medical Science</span></div></div><div class="card-body"><p>Clinical trial management, regulatory affairs, GCP guidelines, and biostatistics for pharma research.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card med"><div class="card-top"><div class="card-icon">🧫</div><div><div class="card-title">M.Sc Biochemistry</div><span class="card-tag">Medical Science</span></div></div><div class="card-body"><p>Metabolism, enzymology, molecular genetics, and protein biochemistry for medical and research labs.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card med"><div class="card-top"><div class="card-icon">🏃</div><div><div class="card-title">B.Sc Sports Medicine & Science</div><span class="card-tag">Medical Science</span></div></div><div class="card-body"><p>Athletic performance, injury prevention, sports rehabilitation, and exercise physiology for sports teams.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card med"><div class="card-top"><div class="card-icon">🌿</div><div><div class="card-title">B.Sc Ayurvedic Sciences</div><span class="card-tag">Medical Science</span></div></div><div class="card-body"><p>Traditional Ayurvedic medicine, herbal pharmacology, panchakarma, and holistic healthcare practice.</p></div><div class="card-footer"><span class="duration">⏱️ 5.5 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card med"><div class="card-top"><div class="card-icon">🧬</div><div><div class="card-title">M.Sc Genetics & Genomics</div><span class="card-tag">Medical Science</span></div></div><div class="card-body"><p>Human genome, gene editing (CRISPR), hereditary diseases, and personalised medicine approaches.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card med"><div class="card-top"><div class="card-icon">👁️</div><div><div class="card-title">B.Sc Optometry</div><span class="card-tag">Medical Science</span></div></div><div class="card-body"><p>Vision science, eye care, ophthalmic optics, and contact lens fitting for clinical optometry practice.</p></div><div class="card-footer"><span class="duration">⏱️ 4 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card med"><div class="card-top"><div class="card-icon">🏨</div><div><div class="card-title">MBA Hospital Administration</div><span class="card-tag">Medical Science</span></div></div><div class="card-body"><p>Healthcare management, hospital operations, medical ethics, and health policy for administrators.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card med"><div class="card-top"><div class="card-icon">🦠</div><div><div class="card-title">M.Sc Immunology & Infectious Disease</div><span class="card-tag">Medical Science</span></div></div><div class="card-body"><p>Immune system disorders, vaccine development, pandemic preparedness, and disease surveillance.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card med"><div class="card-top"><div class="card-icon">🩹</div><div><div class="card-title">B.Sc Emergency & Trauma Care</div><span class="card-tag">Medical Science</span></div></div><div class="card-body"><p>Emergency response, triage, trauma management, and critical care for hospital emergency departments.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card med"><div class="card-top"><div class="card-icon">🧘</div><div><div class="card-title">B.Sc Mental Health & Counselling</div><span class="card-tag">Medical Science</span></div></div><div class="card-body"><p>Psychotherapy, mental health assessment, counselling techniques, and psychiatric care practice.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card med"><div class="card-top"><div class="card-icon">🔭</div><div><div class="card-title">M.Sc Oncology & Cancer Biology</div><span class="card-tag">Medical Science</span></div></div><div class="card-body"><p>Cancer mechanisms, tumour biology, chemotherapy, immunotherapy, and oncology research methods.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card med"><div class="card-top"><div class="card-icon">🏋️</div><div><div class="card-title">B.Sc Occupational Therapy</div><span class="card-tag">Medical Science</span></div></div><div class="card-body"><p>Rehabilitation of daily life skills, adaptive equipment, and therapy for physical and mental disabilities.</p></div><div class="card-footer"><span class="duration">⏱️ 4.5 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card med"><div class="card-top"><div class="card-icon">🌡️</div><div><div class="card-title">M.Pharm Pharmaceutical Sciences</div><span class="card-tag">Medical Science</span></div></div><div class="card-body"><p>Advanced drug formulation, pharmaceutical analysis, quality assurance, and regulatory science.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card med"><div class="card-top"><div class="card-icon">🎯</div><div><div class="card-title">Ph.D Medical Sciences</div><span class="card-tag">Medical Science</span></div></div><div class="card-body"><p>Doctoral research in clinical medicine, biomedical science, pharmacology, or public health.</p></div><div class="card-footer"><span class="duration">⏱️ 3–5 Years</span><button class="btn">Learn More</button></div></div>
+
+<!-- ═══════════════ LAW (20 courses) ═══════════════ -->
+<div class="section-divider"><span>⚖️ School of Law</span></div>
+
+<div class="card law"><div class="card-top"><div class="card-icon">⚖️</div><div><div class="card-title">LLB – Bachelor of Laws</div><span class="card-tag">Law</span></div></div><div class="card-body"><p>Constitutional law, criminal law, civil procedure, and jurisprudence for legal practice and courts.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card law"><div class="card-top"><div class="card-icon">🏛️</div><div><div class="card-title">BA LLB – Integrated Law</div><span class="card-tag">Law</span></div></div><div class="card-body"><p>Integrated arts and law programme covering political science, sociology, and comprehensive legal studies.</p></div><div class="card-footer"><span class="duration">⏱️ 5 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card law"><div class="card-top"><div class="card-icon">🌍</div><div><div class="card-title">LLM – Corporate & International Law</div><span class="card-tag">Law</span></div></div><div class="card-body"><p>Corporate governance, international trade law, and dispute resolution for global legal careers.</p></div><div class="card-footer"><span class="duration">⏱️ 1 Year</span><button class="btn">Learn More</button></div></div>
+
+<div class="card law"><div class="card-top"><div class="card-icon">🔏</div><div><div class="card-title">LLM – Cyber Law & IP Rights</div><span class="card-tag">Law</span></div></div><div class="card-body"><p>IP, data privacy, digital contracts, and cybercrime law for tech, media, and digital industries.</p></div><div class="card-footer"><span class="duration">⏱️ 1 Year</span><button class="btn">Learn More</button></div></div>
+
+<div class="card law"><div class="card-top"><div class="card-icon">👨‍⚕️</div><div><div class="card-title">LLM – Health & Medical Law</div><span class="card-tag">Law</span></div></div><div class="card-body"><p>Medical negligence, patient rights, bioethics, pharmaceutical regulation, and public health law.</p></div><div class="card-footer"><span class="duration">⏱️ 1 Year</span><button class="btn">Learn More</button></div></div>
+
+<div class="card law"><div class="card-top"><div class="card-icon">📜</div><div><div class="card-title">B.Com LLB – Commerce & Law</div><span class="card-tag">Law</span></div></div><div class="card-body"><p>Commerce, taxation, corporate law, and business regulation for corporate legal and finance sectors.</p></div><div class="card-footer"><span class="duration">⏱️ 5 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card law"><div class="card-top"><div class="card-icon">🏢</div><div><div class="card-title">LLM – Labour & Employment Law</div><span class="card-tag">Law</span></div></div><div class="card-body"><p>Workplace rights, employment contracts, union relations, and dispute resolution in labour tribunals.</p></div><div class="card-footer"><span class="duration">⏱️ 1 Year</span><button class="btn">Learn More</button></div></div>
+
+<div class="card law"><div class="card-top"><div class="card-icon">🌐</div><div><div class="card-title">LLM – Human Rights Law</div><span class="card-tag">Law</span></div></div><div class="card-body"><p>International human rights frameworks, humanitarian law, refugee rights, and justice mechanisms.</p></div><div class="card-footer"><span class="duration">⏱️ 1 Year</span><button class="btn">Learn More</button></div></div>
+
+<div class="card law"><div class="card-top"><div class="card-icon">🏦</div><div><div class="card-title">LLM – Banking & Finance Law</div><span class="card-tag">Law</span></div></div><div class="card-body"><p>Financial regulation, securities law, banking compliance, and fintech legal frameworks globally.</p></div><div class="card-footer"><span class="duration">⏱️ 1 Year</span><button class="btn">Learn More</button></div></div>
+
+<div class="card law"><div class="card-top"><div class="card-icon">🌿</div><div><div class="card-title">LLM – Environmental & Energy Law</div><span class="card-tag">Law</span></div></div><div class="card-body"><p>Climate policy, environmental compliance, energy regulation, and sustainability litigation practice.</p></div><div class="card-footer"><span class="duration">⏱️ 1 Year</span><button class="btn">Learn More</button></div></div>
+
+<div class="card law"><div class="card-top"><div class="card-icon">🔒</div><div><div class="card-title">B.Sc LLB – Science & Law</div><span class="card-tag">Law</span></div></div><div class="card-body"><p>Dual degree for science graduates — combining forensic science, patent law, and technology regulation.</p></div><div class="card-footer"><span class="duration">⏱️ 5 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card law"><div class="card-top"><div class="card-icon">🏛️</div><div><div class="card-title">LLM – Constitutional & Administrative Law</div><span class="card-tag">Law</span></div></div><div class="card-body"><p>Constitutional rights, government authority, judicial review, and public interest litigation in India.</p></div><div class="card-footer"><span class="duration">⏱️ 1 Year</span><button class="btn">Learn More</button></div></div>
+
+<div class="card law"><div class="card-top"><div class="card-icon">🕊️</div><div><div class="card-title">LLM – Dispute Resolution & Arbitration</div><span class="card-tag">Law</span></div></div><div class="card-body"><p>Mediation, arbitration, negotiation techniques, and alternative dispute resolution in commercial matters.</p></div><div class="card-footer"><span class="duration">⏱️ 1 Year</span><button class="btn">Learn More</button></div></div>
+
+<div class="card law"><div class="card-top"><div class="card-icon">📱</div><div><div class="card-title">LLM – Technology & Privacy Law</div><span class="card-tag">Law</span></div></div><div class="card-body"><p>GDPR, data protection regulations, AI ethics law, and digital privacy for legal tech professionals.</p></div><div class="card-footer"><span class="duration">⏱️ 1 Year</span><button class="btn">Learn More</button></div></div>
+
+<div class="card law"><div class="card-top"><div class="card-icon">🏘️</div><div><div class="card-title">LLM – Real Estate & Property Law</div><span class="card-tag">Law</span></div></div><div class="card-body"><p>Property rights, land acquisition, real estate transactions, RERA compliance, and tenancy law.</p></div><div class="card-footer"><span class="duration">⏱️ 1 Year</span><button class="btn">Learn More</button></div></div>
+
+<div class="card law"><div class="card-top"><div class="card-icon">🎭</div><div><div class="card-title">LLM – Media & Entertainment Law</div><span class="card-tag">Law</span></div></div><div class="card-body"><p>Film rights, copyright, defamation, broadcasting regulations, and OTT platform legal compliance.</p></div><div class="card-footer"><span class="duration">⏱️ 1 Year</span><button class="btn">Learn More</button></div></div>
+
+<div class="card law"><div class="card-top"><div class="card-icon">🚢</div><div><div class="card-title">LLM – Maritime & Trade Law</div><span class="card-tag">Law</span></div></div><div class="card-body"><p>Shipping contracts, marine insurance, admiralty law, and international trade regulations and disputes.</p></div><div class="card-footer"><span class="duration">⏱️ 1 Year</span><button class="btn">Learn More</button></div></div>
+
+<div class="card law"><div class="card-top"><div class="card-icon">💼</div><div><div class="card-title">LLM – Taxation Law</div><span class="card-tag">Law</span></div></div><div class="card-body"><p>GST, income tax, international taxation, transfer pricing, and tax litigation for corporate clients.</p></div><div class="card-footer"><span class="duration">⏱️ 1 Year</span><button class="btn">Learn More</button></div></div>
+
+<div class="card law"><div class="card-top"><div class="card-icon">🔍</div><div><div class="card-title">LLM – Criminal Justice & Criminology</div><span class="card-tag">Law</span></div></div><div class="card-body"><p>Crime theories, criminal procedure, sentencing policy, and reforms in the criminal justice system.</p></div><div class="card-footer"><span class="duration">⏱️ 1 Year</span><button class="btn">Learn More</button></div></div>
+
+<div class="card law"><div class="card-top"><div class="card-icon">🎯</div><div><div class="card-title">Ph.D Law & Legal Studies</div><span class="card-tag">Law</span></div></div><div class="card-body"><p>Doctoral research in constitutional, international, corporate, or specialised areas of law and jurisprudence.</p></div><div class="card-footer"><span class="duration">⏱️ 3–5 Years</span><button class="btn">Learn More</button></div></div>
+
+<!-- ═══════════════ BUSINESS (23 courses) ═══════════════ -->
+<div class="section-divider"><span>📈 Business School</span></div>
+
+<div class="card biz"><div class="card-top"><div class="card-icon">📈</div><div><div class="card-title">MBA – Business Administration</div><span class="card-tag">Business</span></div></div><div class="card-body"><p>Strategy, finance, marketing, and leadership for future CEOs and business leaders.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card biz"><div class="card-top"><div class="card-icon">💹</div><div><div class="card-title">BBA – Business Administration</div><span class="card-tag">Business</span></div></div><div class="card-body"><p>Management, accounting, economics, and organisational behaviour — the foundation of a business career.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card biz"><div class="card-top"><div class="card-icon">🏦</div><div><div class="card-title">B.Com – Finance & Banking</div><span class="card-tag">Business</span></div></div><div class="card-body"><p>Banking systems, financial markets, taxation, and investment management for finance careers.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card biz"><div class="card-top"><div class="card-icon">📣</div><div><div class="card-title">BBA – Marketing & Digital Media</div><span class="card-tag">Business</span></div></div><div class="card-body"><p>Brand management, social media marketing, consumer behaviour, and digital advertising.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card biz"><div class="card-top"><div class="card-icon">🌏</div><div><div class="card-title">MBA – International Business</div><span class="card-tag">Business</span></div></div><div class="card-body"><p>Global trade, cross-cultural management, foreign exchange, and multinational business strategy.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card biz"><div class="card-top"><div class="card-icon">🚀</div><div><div class="card-title">MBA – Entrepreneurship & Innovation</div><span class="card-tag">Business</span></div></div><div class="card-body"><p>Startup strategy, venture capital, product development, and pitching with live incubator access.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card biz"><div class="card-top"><div class="card-icon">📦</div><div><div class="card-title">BBA – Supply Chain & Logistics</div><span class="card-tag">Business</span></div></div><div class="card-body"><p>Procurement, warehouse management, supply chain analytics, and global logistics operations.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card biz"><div class="card-top"><div class="card-icon">💰</div><div><div class="card-title">MBA – Finance & Investment Banking</div><span class="card-tag">Business</span></div></div><div class="card-body"><p>Corporate finance, M&A, equity analysis, derivatives, and capital markets for investment banking.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card biz"><div class="card-top"><div class="card-icon">🤝</div><div><div class="card-title">MBA – Human Resource Management</div><span class="card-tag">Business</span></div></div><div class="card-body"><p>Talent acquisition, performance management, labour law, and organisational development strategies.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card biz"><div class="card-top"><div class="card-icon">📊</div><div><div class="card-title">MBA – Business Analytics</div><span class="card-tag">Business</span></div></div><div class="card-body"><p>Data-driven decision making, Power BI, Excel modelling, and analytical tools for business strategy.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card biz"><div class="card-top"><div class="card-icon">🏪</div><div><div class="card-title">BBA – Retail & E-Commerce Management</div><span class="card-tag">Business</span></div></div><div class="card-body"><p>Retail operations, e-commerce platforms, customer experience, and digital sales strategy.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card biz"><div class="card-top"><div class="card-icon">🎨</div><div><div class="card-title">BBA – Event & Entertainment Management</div><span class="card-tag">Business</span></div></div><div class="card-body"><p>Event planning, sponsorship, production management, and entertainment industry business operations.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card biz"><div class="card-top"><div class="card-icon">✈️</div><div><div class="card-title">BBA – Tourism & Hospitality Management</div><span class="card-tag">Business</span></div></div><div class="card-body"><p>Hotel operations, travel planning, tourism policy, and global hospitality industry management.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card biz"><div class="card-top"><div class="card-icon">🔎</div><div><div class="card-title">MBA – Operations Management</div><span class="card-tag">Business</span></div></div><div class="card-body"><p>Six Sigma, lean management, quality control, and operations optimisation for manufacturing and services.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card biz"><div class="card-top"><div class="card-icon">🌱</div><div><div class="card-title">MBA – Sustainable Business & ESG</div><span class="card-tag">Business</span></div></div><div class="card-body"><p>Environmental, social, and governance strategy, green business models, and corporate sustainability.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card biz"><div class="card-top"><div class="card-icon">🏥</div><div><div class="card-title">MBA – Healthcare Management</div><span class="card-tag">Business</span></div></div><div class="card-body"><p>Hospital management, health policy, pharmaceutical marketing, and medical device industry strategy.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card biz"><div class="card-top"><div class="card-icon">🏗️</div><div><div class="card-title">MBA – Real Estate & Infrastructure</div><span class="card-tag">Business</span></div></div><div class="card-body"><p>Property valuation, real estate finance, RERA compliance, and infrastructure project management.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card biz"><div class="card-top"><div class="card-icon">📰</div><div><div class="card-title">BBA – Media & Communications Management</div><span class="card-tag">Business</span></div></div><div class="card-body"><p>Mass media, public relations, journalism business models, and digital content strategy.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card biz"><div class="card-top"><div class="card-icon">🤖</div><div><div class="card-title">MBA – Technology Management</div><span class="card-tag">Business</span></div></div><div class="card-body"><p>Tech product management, IT governance, digital strategy, and managing technology-driven organisations.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card biz"><div class="card-top"><div class="card-icon">📋</div><div><div class="card-title">B.Com – Accounting & Taxation</div><span class="card-tag">Business</span></div></div><div class="card-body"><p>Financial accounting, cost accounting, GST, income tax law, and chartered accountancy preparation.</p></div><div class="card-footer"><span class="duration">⏱️ 3 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card biz"><div class="card-top"><div class="card-icon">🌾</div><div><div class="card-title">MBA – Agribusiness Management</div><span class="card-tag">Business</span></div></div><div class="card-body"><p>Farm-to-market supply chains, agricultural economics, rural marketing, and food industry management.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card biz"><div class="card-top"><div class="card-icon">📡</div><div><div class="card-title">MBA – Digital Marketing & Growth</div><span class="card-tag">Business</span></div></div><div class="card-body"><p>SEO, SEM, performance marketing, growth hacking, and data analytics for digital-first businesses.</p></div><div class="card-footer"><span class="duration">⏱️ 2 Years</span><button class="btn">Learn More</button></div></div>
+
+<div class="card biz"><div class="card-top"><div class="card-icon">🎯</div><div><div class="card-title">Ph.D Business & Management</div><span class="card-tag">Business</span></div></div><div class="card-body"><p>Doctoral research in management, strategy, organisational behaviour, finance, or marketing.</p></div><div class="card-footer"><span class="duration">⏱️ 3–5 Years</span><button class="btn">Learn More</button></div></div>
+
+</div><!-- end grid -->
+
+<div class="footer-strip">
+  © 2026 <span>Vandini University</span> · All Rights Reserved
+</div>
+
+<script>
+  function filter(cat, btn) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.card').forEach(card => {
+      card.classList.toggle('hidden', cat !== 'all' && !card.classList.contains(cat));
+    });
+    document.querySelectorAll('.section-divider').forEach(d => {
+      d.classList.toggle('hidden', cat !== 'all');
+    });
+  }
+
+  // Hamburger menu toggle
+  const menuBtn = document.getElementById('menuBtn');
+  const navLinks = document.getElementById('navLinks');
+  menuBtn.addEventListener('click', () => {
+    menuBtn.classList.toggle('open');
+    navLinks.classList.toggle('open');
+  });
+  // Close menu when a link is tapped
+  navLinks.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      menuBtn.classList.remove('open');
+      navLinks.classList.remove('open');
+    });
+  });
+</script>
+</body>
+</html>
